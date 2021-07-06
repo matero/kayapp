@@ -32,6 +32,24 @@
     <kairos_application_class>kayapp.Application</kairos_application_class>
   </properties>
 
+  <repositories>
+    <repository>
+      <id>matero-repo</id>
+      <name>Matero GitHub Repository</name>
+      <url>https://github.com/matero/m2repo</url>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+        <checksumPolicy>fail</checksumPolicy>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+        <checksumPolicy>fail</checksumPolicy>
+      </releases>
+    </repository>
+  </repositories>
+
   <dependencies>
     <dependency>
       <groupId>kayak</groupId>
