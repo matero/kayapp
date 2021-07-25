@@ -68,15 +68,40 @@ class Repository {
     Client.Id(60) to Client(Client.Id(60), Client.Email("anacleta5@email.com")),
   )
 
+  private val byEmail: MutableMap<Client.Email, Client> by lazy {
+    val result = mutableMapOf<Client.Email, Client>()
+    db.values.forEach { result[it.email] = it }
+    result
+  }
+
   fun all(): List<Client> = db.values.toList()
 
   fun exist(id: Client.Id) = db.containsKey(id)
 
-  fun get(id: Client.Id) : Validated<Client> =
+  fun get(id: Client.Id): Validated<Client> =
     if (db.containsKey(id))
       SuccessfulValidation.of(db[id]!!)
     else
       UnsuccessfulValidation.of("client not found")
 
-  fun find(id: Client.Id) : Client? = db[id]
+  fun find(id: Client.Id): Client? = db[id]
+
+  fun insert(
+    email: Client.Email,
+    nickname: Client.Nickname,
+    name: Client.Name,
+    phone: Client.Phone,
+    address: Client.Address,
+    info: Client.Info): Validated<Client> {
+
+    return if (byEmail.containsKey(email))
+      UnsuccessfulValidation.of("another client already has email '${email.describe()}'")
+    else {
+      val id = Client.Id.of(db.size.toLong())
+      val client = Client(id, email, nickname, name, phone, address, info)
+      db[id] = client
+      byEmail[email] = client
+      SuccessfulValidation.of(client)
+    }
+  }
 }
