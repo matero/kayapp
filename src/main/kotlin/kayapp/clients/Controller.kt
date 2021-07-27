@@ -1,22 +1,24 @@
 package kayapp.clients
 
 import kayak.json.Json
-import kayak.web.LongPathParameter
-import kayak.web.Request
-import kayak.web.Response
+import kayak.web.*
 
-class Controller(private val clients: Clients = Clients()) : kayak.web.HttpControllerServlet() {
+class Controller(private val clients: Clients = Clients()) : HttpControllerServlet(), UseMimeTypes {
 
   private val byId = path("/{id}")
 
   override fun doGet(request: Request, response: Response) {
-    when {
-      request.isIndex() ->
-        index(request, response)
-      request.matches(byId) ->
-        getClientById(request, response)
-      else ->
-        unhandledGet(request, response)
+    if (request.accepts(mediaType=application/json)) {
+      when {
+        request.isIndex() ->
+          index(request, response)
+        request.matches(byId) ->
+          getClientById(request, response)
+        else ->
+          unhandledGet(request, response)
+      }
+    } else {
+      unhandledGet(request, response)
     }
   }
 
@@ -27,8 +29,7 @@ class Controller(private val clients: Clients = Clients()) : kayak.web.HttpContr
   }
 
   fun getClientById(request: Request, response: Response) {
-    val pathParameter = request[id]
-    val clientId = Client.Id.of(pathParameter)
+    val clientId = Client.Id.of(request[id])
 
     if (clientId.failed)
       response.notFound()
@@ -43,11 +44,15 @@ class Controller(private val clients: Clients = Clients()) : kayak.web.HttpContr
   }
 
   override fun doPost(request: Request, response: Response) {
-    when {
-      request.isIndex() ->
-        create(request, response)
-      else ->
-        unhandledPost(request, response)
+    if (request.accepts(mediaType=application/json)) {
+      when {
+        request.isIndex() ->
+          create(request, response)
+        else ->
+          unhandledPost(request, response)
+      }
+    } else {
+      unhandledPost(request, response)
     }
   }
 
