@@ -8,7 +8,7 @@ import kayak.validation.validate
 class Clients(private val repository: Repository = Repository()) {
   fun all() = repository.all()
 
-  fun get(id: Client.Id) = repository.get(id)
+  fun get(id: Client.Id): Validated<Client> = repository.get(id)
 
   fun createClientUsing(clientSpec: Json): Validated<Client> {
     if (!clientSpec.isObject())
